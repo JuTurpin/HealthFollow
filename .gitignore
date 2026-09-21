@@ -1,0 +1,16 @@
+# ── Données de santé personnelles (JAMAIS dans git) ───────────────────────────
+sortie-sante/
+details/
+data/
+journal.json
+*.zip
+*.xml
+
+# ── Outils locaux ──────────────────────────────────────────────────────────────
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+.claude/
