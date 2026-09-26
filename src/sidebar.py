@@ -47,7 +47,7 @@ def render_import_sidebar():
         fcmax   = c1.number_input("FC max",   value=185, step=1)
         fcrepos = c2.number_input("FC repos", value=51,  step=1)
 
-        if uploaded and st.button("Importer", type="primary", use_container_width=True):
+        if uploaded and st.button("Importer", type="primary", width="stretch"):
             os.makedirs(os.path.join(PROJECT_ROOT, "data"), exist_ok=True)
             zip_bytes = uploaded.read()
 

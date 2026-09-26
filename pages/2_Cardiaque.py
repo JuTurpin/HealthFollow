@@ -43,7 +43,7 @@ fig.update_layout(
     legend=dict(orientation="h", y=1.1),
     height=350, margin=dict(t=10, b=0),
 )
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, width="stretch")
 
 col1, col2 = st.columns(2)
 
@@ -70,7 +70,7 @@ with col2:
                       labels={"sem_label": "Semaine", "hrv": "HRV (ms)"},
                       color_discrete_sequence=["#0068c9"])
         fig2.update_layout(height=280, margin=dict(t=10, b=0))
-        st.plotly_chart(fig2, use_container_width=True)
+        st.plotly_chart(fig2, width="stretch")
 
 # ── FC moy séances ────────────────────────────────────────────────────────────
 if "fc_moy" in wk.columns:
@@ -85,4 +85,4 @@ if "fc_moy" in wk.columns:
                           color_discrete_map=zone_colors,
                           labels={"fc_moy": "FC moy (bpm)", "date": "Date"})
         fig3.update_layout(height=300, margin=dict(t=10, b=0))
-        st.plotly_chart(fig3, use_container_width=True)
+        st.plotly_chart(fig3, width="stretch")

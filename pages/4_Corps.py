@@ -36,7 +36,7 @@ if "poids" in daily.columns and daily["poids"].notna().any():
                     name="Moy. 7j", line=dict(color="#e74c3c", dash="dash", width=2))
     fig.update_layout(height=300, margin=dict(t=10, b=0),
                       yaxis_title="kg", legend=dict(orientation="h", y=1.1))
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
     col1, col2, col3 = st.columns(3)
     col1.metric("Poids actuel", f"{poids['poids'].iloc[-1]:.1f} kg")
@@ -59,7 +59,7 @@ with col1:
                        labels={"vo2max": "mL/kg/min", "date": "Date"},
                        color_discrete_sequence=["#2ecc71"])
         fig2.update_layout(height=260, margin=dict(t=10, b=0))
-        st.plotly_chart(fig2, use_container_width=True)
+        st.plotly_chart(fig2, width="stretch")
         st.metric("VO2max actuel", f"{vo2['vo2max'].iloc[-1]:.1f} mL/kg/min")
     else:
         st.info("Pas de données VO2max.")
@@ -74,7 +74,7 @@ with col2:
                        labels={"masse_grasse_pct": "%", "date": "Date"},
                        color_discrete_sequence=["#f39c12"])
         fig3.update_layout(height=260, margin=dict(t=10, b=0))
-        st.plotly_chart(fig3, use_container_width=True)
+        st.plotly_chart(fig3, width="stretch")
         st.metric("Masse grasse actuelle", f"{mg['masse_grasse_pct'].iloc[-1]:.1f} %")
     else:
         st.info("Pas de données masse grasse.")
@@ -86,5 +86,5 @@ display_cols = [c for c in ["date", "poids", "masse_grasse", "masse_maigre", "vo
                 if c in daily.columns]
 st.dataframe(
     daily[display_cols].sort_values("date", ascending=False).head(30),
-    use_container_width=True, hide_index=True,
+    width="stretch", hide_index=True,
 )

@@ -39,7 +39,7 @@ fig = px.bar(sleep, x="date", y="sommeil_h",
              range_color=[5, 9])
 fig.add_hline(y=7.5, line_dash="dot", line_color="gray", annotation_text="7h30 cible")
 fig.update_layout(height=320, margin=dict(t=10, b=0), coloraxis_showscale=False)
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, width="stretch")
 
 col1, col2 = st.columns(2)
 
@@ -62,7 +62,7 @@ with col2:
                       labels={"sommeil_moy_h": "h/nuit", "semaine": "Semaine"})
         fig2.add_hline(y=7.5, line_dash="dot", line_color="gray")
         fig2.update_layout(height=280, margin=dict(t=10, b=0), coloraxis_showscale=False)
-        st.plotly_chart(fig2, use_container_width=True)
+        st.plotly_chart(fig2, width="stretch")
 
 # ── Corrélation sommeil / HRV ──────────────────────────────────────────────
 if "hrv" in daily.columns:
@@ -94,6 +94,6 @@ if "hrv" in daily.columns:
             xaxis_title="Sommeil nuit J (h)", yaxis_title="HRV lendemain (ms)",
             legend=dict(orientation="h", y=1.1),
         )
-        st.plotly_chart(fig3, use_container_width=True)
+        st.plotly_chart(fig3, width="stretch")
     else:
         st.caption("Pas assez de points pour la corrélation.")

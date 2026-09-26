@@ -62,7 +62,7 @@ with col_vol:
         legend=dict(orientation="h", y=1.1),
         height=320, margin=dict(t=10, b=0),
     )
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
 with col_charge:
     chart_header("Charge hebdomadaire", H_CHARGE_HEB)
@@ -79,7 +79,7 @@ with col_charge:
         legend=dict(orientation="h", y=1.1),
         height=320, margin=dict(t=10, b=0),
     )
-    st.plotly_chart(fig2, use_container_width=True)
+    st.plotly_chart(fig2, width="stretch")
 
 # ── Répartition des types d'activités ────────────────────────────────────────
 chart_header("Répartition par type d'activité (temps en min)", H_REPARTITION)
@@ -94,7 +94,7 @@ if not type_week.empty:
                   color_discrete_sequence=px.colors.qualitative.Set2)
     fig3.update_layout(height=300, margin=dict(t=10, b=0),
                        legend=dict(orientation="h", y=1.1))
-    st.plotly_chart(fig3, use_container_width=True)
+    st.plotly_chart(fig3, width="stretch")
 
 # ── Tableau récapitulatif ─────────────────────────────────────────────────────
 st.subheader("Tableau de bord par semaine")
@@ -122,7 +122,7 @@ table = table.rename(columns={
 })
 st.dataframe(
     table.sort_values("Semaine", ascending=False),
-    use_container_width=True, hide_index=True,
+    width="stretch", hide_index=True,
 )
 
 st.caption(

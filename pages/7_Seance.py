@@ -103,7 +103,7 @@ else:
         legend=dict(orientation="h", y=1.08),
         yaxis=dict(range=[40, max(raw) + 10]),
     )
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
     # ── Zones réelles + drift ────────────────────────────────────────────────
     col_z, col_d = st.columns(2)
@@ -121,7 +121,7 @@ else:
             ))
             fig2.update_layout(height=260, margin=dict(t=30, b=0),
                                showlegend=False, yaxis_title="Minutes")
-            st.plotly_chart(fig2, use_container_width=True)
+            st.plotly_chart(fig2, width="stretch")
             st.caption(" · ".join(f"{z} {v}" for z, v in limits.items()))
 
     with col_d:
@@ -140,7 +140,7 @@ else:
             ))
             fig3.update_layout(height=260, margin=dict(t=30, b=0),
                                showlegend=False, yaxis_title="FC moy (bpm)")
-            st.plotly_chart(fig3, use_container_width=True)
+            st.plotly_chart(fig3, width="stretch")
 
             drift_pct = drift_res["drift_pct"]
             color_drift = "normal" if abs(drift_pct) < 5 else ("inverse" if drift_pct > 0 else "off")
@@ -213,5 +213,5 @@ else:
         "date", "heure", "duree_min", "km", "dplus_m",
         "allure_min_km", "fc_moy", "zone", "RPE",
     ]].sort_values("date", ascending=False)
-    st.dataframe(display, use_container_width=True, hide_index=True)
+    st.dataframe(display, width="stretch", hide_index=True)
     st.caption(f"{len(same_type)} séance(s) {row['type']} avec distance/durée comparable.")

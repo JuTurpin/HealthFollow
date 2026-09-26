@@ -51,7 +51,7 @@ with col_left:
         import pandas as pd
         st.dataframe(
             pd.DataFrame(doublons),
-            use_container_width=True, hide_index=True,
+            width="stretch", hide_index=True,
         )
     else:
         st.success("Aucun doublon détecté.")
@@ -63,7 +63,7 @@ with col_right:
         import pandas as pd
         df = pd.DataFrame(suspects)
         df["raisons"] = df["raisons"].apply(lambda x: ", ".join(x))
-        st.dataframe(df, use_container_width=True, hide_index=True)
+        st.dataframe(df, width="stretch", hide_index=True)
     else:
         st.success("Aucune séance suspecte détectée.")
 

@@ -110,7 +110,7 @@ else:
         legend=dict(orientation="h", y=1.1),
         height=320, margin=dict(t=10, b=0),
     )
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
 st.divider()
 
@@ -140,7 +140,7 @@ else:
         yaxis_title="Heures",
         legend=dict(orientation="h", y=1.1),
     )
-    st.plotly_chart(fig_s, use_container_width=True)
+    st.plotly_chart(fig_s, width="stretch")
 
 st.divider()
 
@@ -179,7 +179,7 @@ else:
         legend=dict(orientation="h", y=1.1),
         height=300, margin=dict(t=10, b=0),
     )
-    st.plotly_chart(fig_c, use_container_width=True)
+    st.plotly_chart(fig_c, width="stretch")
 
 st.divider()
 
@@ -208,7 +208,7 @@ else:
         yaxis=dict(title="RPE moyen", range=[0, 11]),
         showlegend=False,
     )
-    st.plotly_chart(fig_r, use_container_width=True)
+    st.plotly_chart(fig_r, width="stretch")
 
 st.divider()
 
@@ -252,14 +252,14 @@ else:
             yaxis_title="Drift %  (positif = fatigue)",
             showlegend=False,
         )
-        st.plotly_chart(fig_d, use_container_width=True)
+        st.plotly_chart(fig_d, width="stretch")
 
         detail_cols = ["date", "type", "duree_min", "km", "dplus_m",
                        "fc_moy", "hr_first", "hr_last", "drift_pct", "dur_min"]
         avail = [c for c in detail_cols if c in drifts_df.columns]
         st.dataframe(
             drifts_df[avail].sort_values("date", ascending=False),
-            use_container_width=True, hide_index=True,
+            width="stretch", hide_index=True,
         )
 
 st.caption(

@@ -89,7 +89,7 @@ with st.expander(QUESTIONS[0], expanded=True):
         )
         fig.update_layout(height=200, margin=dict(t=5, b=0), showlegend=False,
                           yaxis_title="Charge TRIMP")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
         if semaines_actives < 6:
             st.warning(f"Seulement {semaines_actives}/8 semaines actives — régularité à améliorer.")
@@ -147,7 +147,7 @@ with st.expander(QUESTIONS[1], expanded=False):
             xaxis_title="Date", yaxis_title="Allure (min/km)",
             legend=dict(orientation="h", y=1.1),
         )
-        st.plotly_chart(fig2, use_container_width=True)
+        st.plotly_chart(fig2, width="stretch")
         st.caption(
             f"{len(pace_df)} séances Course Z2/Z3 ≥ 5 km · {delta_lbl} · "
             "Couleur = FC moy (vert = bas, rouge = élevé)."
@@ -193,7 +193,7 @@ with st.expander(QUESTIONS[2], expanded=False):
             height=240, margin=dict(t=10, b=0),
             yaxis_title="Drift % (positif = FC monte)", showlegend=False,
         )
-        st.plotly_chart(fig3, use_container_width=True)
+        st.plotly_chart(fig3, width="stretch")
 
         if abs(drift_moy) < 5:
             st.success(f"Bonne tenue cardio en moyenne ({drift_moy:+.1f} %).")
@@ -247,7 +247,7 @@ with st.expander(QUESTIONS[3], expanded=False):
         legend=dict(orientation="h", y=1.1),
         height=280, margin=dict(t=10, b=0),
     )
-    st.plotly_chart(fig4, use_container_width=True)
+    st.plotly_chart(fig4, width="stretch")
 
     pct = ratio_global / RACE_RATIO * 100
     if pct >= 80:
@@ -330,7 +330,7 @@ with st.expander(QUESTIONS[4], expanded=False):
                 legend=dict(orientation="h", y=1.1),
                 height=240, margin=dict(t=5, b=0),
             )
-            st.plotly_chart(fig5, use_container_width=True)
+            st.plotly_chart(fig5, width="stretch")
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Q6 — Nuit & ravitaillement
@@ -368,7 +368,7 @@ with st.expander(QUESTIONS[5], expanded=False):
     if sorties_nuit_avec_ravito:
         st.subheader("Historique ravitaillement nocturne")
         df_ravito = pd.DataFrame(sorties_nuit_avec_ravito)
-        st.dataframe(df_ravito, use_container_width=True, hide_index=True)
+        st.dataframe(df_ravito, width="stretch", hide_index=True)
 
         # Observations
         df_r = df_ravito.copy()
@@ -396,7 +396,7 @@ with st.expander(QUESTIONS[5], expanded=False):
                  "type": r["type"], "duree_min": r.get("duree_min")}
                 for r in sorties_nuit_sans_journal
             ])
-            st.dataframe(df_sans, use_container_width=True, hide_index=True)
+            st.dataframe(df_sans, width="stretch", hide_index=True)
             st.caption("→ Complétez dans la page **Journal** pour nourrir cet historique.")
 
 st.divider()

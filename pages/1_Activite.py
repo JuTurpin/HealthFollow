@@ -43,7 +43,7 @@ fig.update_layout(
     legend=dict(orientation="h", y=1.1),
     height=320, margin=dict(t=10, b=0),
 )
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, width="stretch")
 
 col1, col2 = st.columns(2)
 
@@ -54,7 +54,7 @@ with col1:
     fig2 = px.pie(by_type, names="type", values="duree_min",
                   color_discrete_sequence=px.colors.qualitative.Set2)
     fig2.update_layout(height=320, margin=dict(t=20, b=0))
-    st.plotly_chart(fig2, use_container_width=True)
+    st.plotly_chart(fig2, width="stretch")
 
 # ── Temps réels en zones (FC horodatée) ───────────────────────────────────────
 with col2:
@@ -84,7 +84,7 @@ with col2:
         ))
         fig3.update_layout(height=300, margin=dict(t=30, b=0), showlegend=False,
                            yaxis_title="Minutes totales")
-        st.plotly_chart(fig3, use_container_width=True)
+        st.plotly_chart(fig3, width="stretch")
         st.caption(
             f"{coverage}/{len(wk)} séances avec FC détaillée. "
             + " · ".join(f"{z} {v}" for z, v in limits.items())
@@ -105,7 +105,7 @@ if zone_rows:
         barmode="stack", height=300, margin=dict(t=10, b=0),
         yaxis_title="Minutes", legend=dict(orientation="h", y=1.1),
     )
-    st.plotly_chart(fig5, use_container_width=True)
+    st.plotly_chart(fig5, width="stretch")
 
 # ── Progression course ────────────────────────────────────────────────────────
 courses = wk[wk["type"] == "Course"].copy()
@@ -131,11 +131,11 @@ if not courses.empty:
     )
     fig4.update_layout(height=320, margin=dict(t=10, b=0),
                        xaxis_title="Date", yaxis_title="Allure (min/km)")
-    st.plotly_chart(fig4, use_container_width=True)
+    st.plotly_chart(fig4, width="stretch")
 
 # ── Tableau séances ───────────────────────────────────────────────────────────
 st.subheader("Toutes les séances")
 cols = ["date", "heure", "type", "duree_min", "km", "dplus_m",
         "allure_min_km", "vitesse_km_h", "fc_moy", "fc_max", "zone", "kcal", "nocturne"]
 st.dataframe(wk[cols].sort_values("date", ascending=False),
-             use_container_width=True, hide_index=True)
+             width="stretch", hide_index=True)

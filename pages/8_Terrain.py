@@ -84,7 +84,7 @@ fig.update_layout(
     legend=dict(orientation="h", y=1.1),
     height=320, margin=dict(t=10, b=0),
 )
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, width="stretch")
 
 # ── Ratio D+/km vs cible course ───────────────────────────────────────────────
 chart_header(f"Ratio D+/km par semaine vs cible course ({race_ratio:.1f} m/km)", H_RATIO_DPLUS)
@@ -101,7 +101,7 @@ fig2.add_bar(
 fig2.add_hline(y=race_ratio, line_dash="dash", line_color="#e74c3c",
                annotation_text=f"Cible {race_ratio:.1f} m/km", annotation_position="top right")
 fig2.update_layout(height=260, margin=dict(t=10, b=0), yaxis_title="m D+/km", showlegend=False)
-st.plotly_chart(fig2, use_container_width=True)
+st.plotly_chart(fig2, width="stretch")
 
 # ── Progression de la sortie longue ──────────────────────────────────────────
 chart_header("Progression de la sortie longue (course/rando)", H_SORTIE_LONGUE)
@@ -131,7 +131,7 @@ fig3.update_layout(
     legend=dict(orientation="h", y=1.1),
     height=300, margin=dict(t=10, b=0),
 )
-st.plotly_chart(fig3, use_container_width=True)
+st.plotly_chart(fig3, width="stretch")
 
 # ── Top séances D+ ────────────────────────────────────────────────────────────
 st.subheader("Séances avec le plus de D+")
@@ -144,7 +144,7 @@ top_dplus = (
 if top_dplus.empty:
     st.info("Aucune séance avec D+ enregistré.")
 else:
-    st.dataframe(top_dplus, use_container_width=True, hide_index=True)
+    st.dataframe(top_dplus, width="stretch", hide_index=True)
 
 # ── Note GPS ─────────────────────────────────────────────────────────────────
 st.caption(
