@@ -214,8 +214,8 @@ class TestPack(unittest.TestCase):
         cls.wk = pd.read_csv(os.path.join(d, "workouts.csv"), sep=";")
         cls.daily = pd.read_csv(os.path.join(d, "daily.csv"), sep=";")
         cls.weekly = pd.read_csv(os.path.join(d, "weekly.csv"), sep=";")
-        cls.details = {os.path.basename(p)[:-5]: _json(p)
-                       for p in glob.glob(os.path.join(cls.tmp, "details", "*.json"))}
+        cls.details = {d["workout_id"]: d for d in
+                       (_json(p) for p in glob.glob(os.path.join(cls.tmp, "details", "*.json")))}
         cls.journal = _json(os.path.join(cls.tmp, "journal.json"))
         cls.planning_path = os.path.join(cls.tmp, "planning-hebdo.md")
         with open(cls.planning_path, "w", encoding="utf-8") as f:

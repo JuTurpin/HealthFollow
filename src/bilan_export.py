@@ -169,6 +169,12 @@ def allure(km, duree_min) -> str | None:
 # ══════════════════════════════════════════════════════════════════════════════
 # Semaines
 # ══════════════════════════════════════════════════════════════════════════════
+def periode_calcul(lundi: date) -> tuple[date, date]:
+    """Séances nécessaires à l'export : tendance 8 semaines et charge 28 jours."""
+    dim = lundi + timedelta(days=6)
+    return min(lundi - timedelta(weeks=TENDANCE_SEMAINES - 1), dim - timedelta(days=27)), dim
+
+
 def lundi_de(d: date) -> date:
     return d - timedelta(days=d.weekday())
 
@@ -1033,11 +1039,11 @@ def digest(ctx: dict) -> str:
     # Charge
     c = ctx["charge"]
     L += ["", "## Charge",
-          f"TRIMP semaine : course {c['trimp_course']} / total {c['trimp_total']}"
+          f"- TRIMP semaine : course {c['trimp_course']} / total {c['trimp_total']}"
           + (f" ({c['sans_trimp']} séance(s) sans TRIMP)" if c["sans_trimp"] else ""),
-          f"ATL {_md(c['atl'])} · CTL {_md(c['ctl'])} · TSB {_md(c['tsb'])} (au {dim:%d/%m}, "
+          f"- ATL {_md(c['atl'])} · CTL {_md(c['ctl'])} · TSB {_md(c['tsb'])} (au {dim:%d/%m}, "
           "TRIMP sur FC moyenne)",
-          f"Ratio charge 7 j / moyenne hebdo 28 j : {_md(c['ratio_7_28'])}"]
+          f"- Ratio charge 7 j / moyenne hebdo 28 j : {_md(c['ratio_7_28'])}"]
 
     # Récupération
     L += ["", "## Récupération (7 jours)"]
@@ -1146,11 +1152,8 @@ def construire_pack(lundi: date, workouts: pd.DataFrame, daily: pd.DataFrame,
     Retourne {"nom", "fichiers": {nom: str}, "digest", "seances", "sans_journal"}.
     """
     now = now or datetime.now()
-    dim = lundi + timedelta(days=6)
-    debut8 = lundi - timedelta(weeks=TENDANCE_SEMAINES - 1)
-    debut_charge = min(debut8, dim - timedelta(days=27))
-
-    wk_8 = seances_periode(workouts, debut_charge, dim)
+    debut_calcul, dim = periode_calcul(lundi)
+    wk_8 = seances_periode(workouts, debut_calcul, dim)
     se_8, splits_8 = tableau_seances(wk_8, details, entries, cfg)
     if se_8.empty:
         se_8 = pd.DataFrame(columns=SEANCES_COLS + ["_avec_fc", "_avec_gps", "_journal",

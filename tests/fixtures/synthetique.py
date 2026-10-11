@@ -19,6 +19,7 @@ import sys
 from datetime import date, datetime, timedelta
 
 import sainteylon_health as sh
+from src.detail_parser import workout_filename
 
 LAT0, LON0 = 45.123456, 4.654321   # point fictif
 FIN = date(2026, 10, 11)            # dimanche
@@ -148,7 +149,8 @@ def generer(racine: str, seed: int = 7) -> dict:
     sh.export_csv(data_dir, workouts, jours, sem, sh.RACE_DATE)
 
     for wid, d in details.items():
-        with open(os.path.join(det_dir, f"{wid}.json"), "w", encoding="utf-8") as f:
+        fname = workout_filename(*wid.split("_", 2)[:2], wid.split("_", 2)[2])
+        with open(os.path.join(det_dir, f"{fname}.json"), "w", encoding="utf-8") as f:
             json.dump(d, f)
     with open(os.path.join(racine, "journal.json"), "w", encoding="utf-8") as f:
         json.dump(journal, f, ensure_ascii=False, indent=2)
