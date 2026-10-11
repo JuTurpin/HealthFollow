@@ -35,7 +35,11 @@ from xml.etree import ElementTree as ET
 # --------------------------------------------------------------------------
 FC_MAX = 185
 FC_REPOS = 51
-RACE_DATE = date(2026, 11, 28)  # SainteLyon Express — depart 28/11/2026 23h00
+try:  # parametres course centralises dans src/config.py (stdlib uniquement)
+    from src import config as _config
+    RACE_DATE = _config.race()["date"]
+except ImportError:  # script copie seul, hors du depot
+    RACE_DATE = date(2026, 11, 28)  # SainteLyon Express — depart 28/11/2026 23h00
 
 # Types de seances qui comptent dans le volume "course"
 RUN_TYPES = {"Running", "TrailRunning", "Hiking"}
@@ -321,26 +325,41 @@ def dedupe_workouts(ws):
 # --------------------------------------------------------------------------
 # D+ depuis les traces GPX (fallback quand HKElevationAscended est absent)
 # --------------------------------------------------------------------------
+def lisser_altitudes(eles, k=5):
+    """Moyenne glissante sur 2k+1 points pour attenuer le bruit barometrique."""
+    return [sum(eles[max(0, i - k):i + k + 1]) / len(eles[max(0, i - k):i + k + 1])
+            for i in range(len(eles))]
+
+
+def cumul_denivele(lisse, seuil=1.0):
+    """(D+, D-) cumules sur une altitude lissee : on ignore les variations sous `seuil` metres."""
+    if not lisse:
+        return 0.0, 0.0
+    gain = perte = 0.0
+    ref_h = ref_b = lisse[0]
+    for e in lisse[1:]:
+        if e - ref_h >= seuil:
+            gain += e - ref_h
+            ref_h = e
+        elif e < ref_h:
+            ref_h = e
+        if ref_b - e >= seuil:
+            perte += ref_b - e
+            ref_b = e
+        elif e > ref_b:
+            ref_b = e
+    return gain, perte
+
+
 def gpx_gain(data, seuil=1.0):
-    """D+ cumule avec lissage : on ignore les micro-variations sous `seuil` metres."""
+    """(D+, D-) cumules avec lissage : on ignore les micro-variations sous `seuil` metres."""
     eles = [to_float(e.text) for e in ET.fromstring(data).iter()
             if e.tag.endswith("}ele") or e.tag == "ele"]
     eles = [e for e in eles if e is not None]
     if len(eles) < 3:
         return None, None
-    # moyenne glissante sur 5 points pour attenuer le bruit barometrique
-    k = 5
-    lisse = [sum(eles[max(0, i - k):i + k + 1]) / len(eles[max(0, i - k):i + k + 1])
-             for i in range(len(eles))]
-    gain = 0.0
-    ref = lisse[0]
-    for e in lisse[1:]:
-        if e - ref >= seuil:
-            gain += e - ref
-            ref = e
-        elif e < ref:
-            ref = e
-    return round(gain), None
+    gain, perte = cumul_denivele(lisser_altitudes(eles), seuil)
+    return round(gain), round(perte)
 
 
 def gpx_start_time(name):

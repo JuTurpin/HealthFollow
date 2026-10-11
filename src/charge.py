@@ -13,6 +13,21 @@ def trimp(dur_min: float, fc_moy: float, fc_repos: int, fc_max: int) -> float:
     return dur_min * d * 0.64 * math.exp(1.92 * d)
 
 
+def trimp_echantillons(hr_samples: list[dict], fc_repos: int, fc_max: int,
+                       max_gap_s: int = 300) -> float:
+    """
+    TRIMP Banister sommé intervalle par intervalle sur les échantillons FC horodatés.
+    Les intervalles plus longs que max_gap_s (trous, pauses) ne sont pas comptés.
+    """
+    samples = sorted(hr_samples, key=lambda x: x["ts"])
+    total = 0.0
+    for a, b in zip(samples, samples[1:]):
+        dt = b["ts"] - a["ts"]
+        if 0 < dt <= max_gap_s:
+            total += trimp(dt / 60.0, a["bpm"], fc_repos, fc_max)
+    return total
+
+
 def weekly_load(workouts: pd.DataFrame) -> pd.DataFrame:
     """
     Retourne un DataFrame par semaine avec :
