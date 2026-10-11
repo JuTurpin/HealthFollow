@@ -65,6 +65,18 @@ class TestSemaines(unittest.TestCase):
         self.assertEqual(be.derniere_semaine_complete(date(2026, 10, 11)), date(2026, 9, 28))
         self.assertEqual(be.derniere_semaine_complete(date(2026, 10, 12)), date(2026, 10, 5))
 
+    def test_semaines_relatives(self):
+        today = date(2026, 10, 14)   # mercredi, semaine en cours = 12/10
+        self.assertEqual(be.semaines_relatives(today, 0, 1), [date(2026, 10, 12)])
+        self.assertEqual(be.semaines_relatives(today, 1, 1), [date(2026, 10, 5)])
+        self.assertEqual(be.semaines_relatives(today, 1, 3),
+                         [date(2026, 9, 21), date(2026, 9, 28), date(2026, 10, 5)])
+        self.assertEqual(be.semaines_relatives(today, 0, 2), [date(2026, 10, 5), date(2026, 10, 12)])
+        with self.assertRaises(ValueError):
+            be.semaines_relatives(today, -1, 1)
+        with self.assertRaises(ValueError):
+            be.semaines_relatives(today, 0, 0)
+
     def test_iso_tag_vs_strftime_W(self):
         # %W (ancien bilan) se trompe d'une semaine en 2026 ; iso_tag suit la norme ISO
         self.assertEqual(be.iso_tag(date(2026, 10, 5)), "2026-W41")
@@ -325,6 +337,24 @@ class TestPack(unittest.TestCase):
     def test_planning_non_modifie(self):
         with open(self.planning_path, "rb") as f:
             self.assertEqual(f.read(), self.planning_avant)
+
+    def test_plusieurs_semaines(self):
+        lundis = be.semaines_relatives(date(2026, 10, 14), 1, 3)
+        packs = [be.construire_pack(l, self.wk, self.daily, self.weekly, self.details,
+                                    self.journal, CFG, RACE, now=datetime(2026, 10, 14, 21, 0))
+                 for l in lundis]
+        self.assertEqual(be.nom_multi(packs), "bilan_S-09_a_S-07_2026-W39_2026-W41")
+        self.assertEqual(be.nom_multi(packs[:1]), "bilan_S-09_2026-W39")
+        fichiers = be.fichiers_multi(packs)
+        self.assertIn("bilan_S-08_2026-W40/digest.md", fichiers)
+        self.assertIn("bilan_S-07_2026-W41/seances.csv", fichiers)
+        self.assertEqual(len(fichiers), 15)
+        self.assertEqual(be.fichiers_multi(packs[:1]), packs[0]["fichiers"])
+        contenu = be.zip_pack(fichiers)
+        self.assertLess(len(contenu), 150 * 1024)
+        z = zipfile.ZipFile(io.BytesIO(contenu))
+        for nom in z.namelist():
+            self.assertNotIn(f"{fx.LAT0:.3f}", z.read(nom).decode("utf-8"))
 
     def test_sans_planning(self):
         p = be.construire_pack(date(2026, 10, 5), self.wk, self.daily, self.weekly, self.details,

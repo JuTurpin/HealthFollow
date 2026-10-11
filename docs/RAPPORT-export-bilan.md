@@ -43,6 +43,15 @@ Les cinq étapes de la liste de priorités sont terminées.
 - J'ai relu `digest.md` dans le zip téléchargé.
 - **Ces vérifications ont été faites avec le jeu synthétique.** Aucune donnée réelle n'était présente dans le conteneur.
 
+### Ajout : sélection de plusieurs semaines
+
+La liste déroulante de semaine est remplacée par deux champs numériques relatifs à la semaine en cours :
+
+- **Dernière semaine exportée** : 0 = semaine en cours, 1 = semaine précédente (valeur par défaut, la dernière semaine complète), 2 = celle d'avant, etc. ;
+- **Nombre de semaines** : de 1 à 12, en remontant à partir de la dernière.
+
+Les semaines retenues s'affichent avec leur libellé `S-XX · 2026-Www · JJ/MM → JJ/MM`. Avec une seule semaine, le zip est inchangé. Avec plusieurs, il contient un sous-dossier complet par semaine (`bilan_S-09_2026-W39/digest.md`…) et s'appelle `bilan_S-10_a_S-08_2026-W38_2026-W40.zip`. Sur le disque, chaque semaine va dans son dossier `sortie-sante/bilans/S-XX/` et le zip groupé dans `sortie-sante/bilans/`. Le planning décrit une seule semaine : il est appliqué à la plus récente.
+
 ## 2. Données introuvables, et comment elles sont traitées
 
 - **Heure de fin** : elle n'existe pas dans `workouts.csv`. Elle est calculée comme heure de début + `duree_min`.
@@ -107,7 +116,7 @@ Les cinq étapes de la liste de priorités sont terminées.
 ```
 $ python -m unittest
 ..............................
-Ran 30 tests in 2.6s
+Ran 32 tests in 4.9s
 OK
 ```
 

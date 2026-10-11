@@ -20,7 +20,7 @@ Construit avec Python + Streamlit. Aucune donnée ne quitte la machine — tout 
 - **Terrain** : dénivelé hebdo, ratio D+/km, progression sortie longue
 - **Récupération** : baselines personnelles, rolling 7j, charge vs HRV
 - **SaintExpress** : synthèse préparation course (adaptable à tout objectif)
-- **Export bilan coach** : pack hebdomadaire `bilan_S-XX_AAAA-Www.zip` à glisser dans la conversation avec le coach — `digest.md` (résumé au format protocole, détail des séances, sortie longue, charge, récupération, tendance 8 semaines, anomalies) + `seances.csv`, `splits.csv`, `jours.csv`, `tendance.csv` et, si `planning-hebdo.md` est fourni, `prevu_vs_realise.csv`. Aucune latitude/longitude dans le pack. Copie locale dans `sortie-sante/bilans/S-XX/`.
+- **Export bilan coach** : pack hebdomadaire `bilan_S-XX_AAAA-Www.zip` à glisser dans la conversation avec le coach — `digest.md` (résumé au format protocole, détail des séances, sortie longue, charge, récupération, tendance 8 semaines, anomalies) + `seances.csv`, `splits.csv`, `jours.csv`, `tendance.csv` et, si `planning-hebdo.md` est fourni, `prevu_vs_realise.csv`. Aucune latitude/longitude dans le pack. Choix des semaines en nombre, relativement à la semaine en cours (0 = en cours, 1 = précédente…) et nombre de semaines exportées : avec plusieurs semaines, le zip contient un sous-dossier complet par semaine. Copie locale dans `sortie-sante/bilans/S-XX/`.
 - **Abréviations** : glossaire complet de tous les termes
 
 ---

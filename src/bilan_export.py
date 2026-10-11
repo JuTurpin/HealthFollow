@@ -200,15 +200,15 @@ def derniere_semaine_complete(today: date) -> date:
     return lundi_de(today) - timedelta(days=7)
 
 
-def semaines_disponibles(workouts: pd.DataFrame, daily: pd.DataFrame,
-                         today: date) -> list[date]:
-    """Lundis des semaines présentes dans les données (+ la dernière complète), récents d'abord."""
-    lundis = {derniere_semaine_complete(today)}
-    for df in (workouts, daily):
-        if df is not None and not df.empty and "date" in df.columns:
-            for d in pd.to_datetime(df["date"]).dt.date.unique():
-                lundis.add(lundi_de(d))
-    return sorted((l for l in lundis if l <= lundi_de(today)), reverse=True)
+def semaines_relatives(today: date, decalage: int, nombre: int) -> list[date]:
+    """
+    Lundis des `nombre` semaines se terminant `decalage` semaines avant la semaine en cours
+    (0 = semaine en cours, 1 = semaine précédente…), du plus ancien au plus récent.
+    """
+    if decalage < 0 or nombre < 1:
+        raise ValueError("decalage >= 0 et nombre >= 1")
+    ref = lundi_de(today)
+    return [ref - timedelta(weeks=decalage + i) for i in range(nombre - 1, -1, -1)]
 
 
 def _dates_col(df: pd.DataFrame) -> pd.Series:
@@ -1206,6 +1206,21 @@ def construire_pack(lundi: date, workouts: pd.DataFrame, daily: pd.DataFrame,
         "seances": se,
         "sans_journal": [f"{_jour_heure(s)} {s['type']}" for _, s in se.iterrows() if not s["_journal"]],
     }
+
+
+def nom_multi(packs: list[dict]) -> str:
+    """Nom du zip : celui du pack si une seule semaine, sinon la plage couverte."""
+    if len(packs) == 1:
+        return packs[0]["nom"]
+    a, b = packs[0]["nom"].split("_")[1:], packs[-1]["nom"].split("_")[1:]
+    return f"bilan_{a[0]}_a_{b[0]}_{a[1]}_{b[1]}"
+
+
+def fichiers_multi(packs: list[dict]) -> dict[str, str]:
+    """Une semaine : fichiers à la racine. Plusieurs : un sous-dossier par semaine."""
+    if len(packs) == 1:
+        return dict(packs[0]["fichiers"])
+    return {f"{p['nom']}/{nom}": contenu for p in packs for nom, contenu in p["fichiers"].items()}
 
 
 def zip_pack(fichiers: dict[str, str]) -> bytes:
