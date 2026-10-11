@@ -20,6 +20,7 @@ Construit avec Python + Streamlit. Aucune donnée ne quitte la machine — tout 
 - **Terrain** : dénivelé hebdo, ratio D+/km, progression sortie longue
 - **Récupération** : baselines personnelles, rolling 7j, charge vs HRV
 - **SaintExpress** : synthèse préparation course (adaptable à tout objectif)
+- **Export bilan coach** : pack hebdomadaire `bilan_S-XX_AAAA-Www.zip` à glisser dans la conversation avec le coach — `digest.md` (résumé au format protocole, détail des séances, sortie longue, charge, récupération, tendance 8 semaines, anomalies) + `seances.csv`, `splits.csv`, `jours.csv`, `tendance.csv` et, si `planning-hebdo.md` est fourni, `prevu_vs_realise.csv`. Aucune latitude/longitude dans le pack. Copie locale dans `sortie-sante/bilans/S-XX/`.
 - **Abréviations** : glossaire complet de tous les termes
 
 ---
@@ -58,10 +59,11 @@ Les données sont stockées localement dans `sortie-sante/` et `details/` — ce
 
 ```
 Home.py                  # Page d'accueil
-pages/                   # Pages Streamlit (Activité, Cardiaque, Sommeil…)
+sainteylon_health.py     # Parser Apple Health XML (passe 1)
+pages/                   # Pages Streamlit (Activité, Cardiaque, Sommeil…, 12_Export_bilan)
 src/
   sidebar.py             # Import, filtre global de période
-  sainteylon_health.py   # Parser Apple Health XML (passe 1)
+  bilan_export.py        # Export bilan coach (sans Streamlit, testable)
   detail_parser.py       # Extraction FC/GPS détaillée (passe 2)
   charge.py              # Calcul TRIMP
   synthesis.py           # Blocs synthèse + PMC
@@ -69,9 +71,18 @@ src/
   zones.py               # Calcul zones Karvonen
   drift.py               # Analyse drift cardiaque
   journal.py             # Journal d'entraînement
-  config.py              # FC max / FC repos
+  config.py              # FC max / FC repos, paramètres course (date, km, D+)
   help_texts.py          # Textes d'aide des graphiques
+tests/                   # python -m unittest
+  fixtures/synthetique.py  # jeu de données synthétique (python -m tests.fixtures.synthetique <dossier>)
+docs/                    # rapports
 requirements.txt
+```
+
+## Tests
+
+```bash
+python -m unittest
 ```
 
 ---
@@ -81,6 +92,8 @@ requirements.txt
 FC max et FC repos se règlent dans la sidebar au moment de l'import. Ils sont sauvegardés dans `sortie-sante/params.json` (exclu de git).
 
 Les zones cardiaques utilisent la **méthode Karvonen** (FC de réserve).
+
+Les paramètres de course (défaut : 2026-11-28, 45 km, 1200 m D+) sont centralisés dans `src/config.py` et peuvent être surchargés dans `params.json` (`race_date`, `race_km`, `race_dplus_m`).
 
 ---
 
