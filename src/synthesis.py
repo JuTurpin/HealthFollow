@@ -5,16 +5,17 @@ import math
 import pandas as pd
 
 
-def pmc_block(workouts_full: pd.DataFrame) -> pd.DataFrame:
+def pmc_block(workouts_full: pd.DataFrame, cfg: dict | None = None) -> pd.DataFrame:
     """
     Performance Management Chart.
     Retourne un DataFrame daily avec : date, trimp, ctl, atl, tsb.
     Calcule sur tout l'historique pour des valeurs CTL/ATL correctes.
+    cfg : paramètres FC (défaut : config.load()).
     """
     from src import config
     from src.charge import trimp as calc_trimp
 
-    cfg = config.load()
+    cfg = cfg or config.load()
     fc_max, fc_repos = cfg["fc_max"], cfg["fc_repos"]
 
     wf = workouts_full.copy()

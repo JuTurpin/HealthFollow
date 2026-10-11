@@ -10,6 +10,7 @@ import streamlit as st
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from src.sidebar import render_import_sidebar, DATA_DIR, filter_period
+from src import config
 from src.help_texts import chart_header
 from src.help_texts import H_DPLUS_HEB, H_RATIO_DPLUS, H_SORTIE_LONGUE
 
@@ -32,9 +33,10 @@ TYPES_COURSE = {"Course", "Rando", "TrailRunning", "Hiking"}
 # ── Paramètres course ─────────────────────────────────────────────────────────
 with st.expander("Paramètres SaintExpress", expanded=False):
     c1, c2, c3 = st.columns(3)
-    race_km    = c1.number_input("Distance course (km)",   value=45.0, step=0.5)
-    race_dplus = c2.number_input("D+ cible (m)",           value=1200, step=50)
-    race_date  = c3.date_input("Date de départ",           value=date(2026, 11, 28))
+    _race      = config.race()
+    race_km    = c1.number_input("Distance course (km)",   value=_race["km"], step=0.5)
+    race_dplus = c2.number_input("D+ cible (m)",           value=_race["dplus_m"], step=50)
+    race_date  = c3.date_input("Date de départ",           value=_race["date"])
 
 race_ratio = race_dplus / race_km  # m D+/km cible
 

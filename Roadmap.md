@@ -51,6 +51,7 @@ Lorsqu'une vue nécessite les données de la passe complète et que celles-ci ne
 | 9 | **Récupération croisée** (HRV / sommeil / ressenti, tendance personnelle) | Moyenne | Journal (1) | Fait |
 | 10 | **Journal nuit & ravitaillement** (matériel, glucides, tolérance) | Faible | Journal (1) | Fait |
 | 11 | **Page synthèse SaintExpress** (6 questions, bilan hebdo exportable) | Élevée | Tout | Fait |
+| 12 | **Export bilan coach** (pack zip hebdo : digest.md, séances, splits, jours, tendance 8 sem., prévu vs réalisé) | Élevée | Tout | Fait |
 
 ---
 

@@ -1,4 +1,4 @@
-"""Synthèse préparation SaintExpress — 6 questions + bilan hebdo exportable."""
+"""Synthèse préparation SaintExpress — 6 questions (bilan hebdo : page Export bilan coach)."""
 import os
 import sys
 from datetime import date, timedelta
@@ -13,14 +13,15 @@ from src import recuperation, charge, config, journal, zones
 from src.help_texts import chart_header
 from src.help_texts import H_REGULARITE, H_PROGRESSION, H_TENUE_LONGUE, H_TERRAIN
 
-RACE_DATE    = date(2026, 11, 28)
-RACE_KM      = 45.0
-RACE_DPLUS   = 1200
-RACE_RATIO   = RACE_DPLUS / RACE_KM
+_RACE        = config.race()
+RACE_DATE    = _RACE["date"]
+RACE_KM      = _RACE["km"]
+RACE_DPLUS   = _RACE["dplus_m"]
+RACE_RATIO   = _RACE["ratio"]
 TYPES_COURSE = {"Course", "Rando", "TrailRunning", "Hiking"}
 
 st.set_page_config(page_title="SaintExpress", layout="wide")
-st.title("Préparation SaintExpress 2026")
+st.title(f"Préparation SaintExpress {RACE_DATE.year}")
 
 render_import_sidebar()
 
@@ -46,7 +47,8 @@ runs["dplus_m"] = pd.to_numeric(runs["dplus_m"], errors="coerce").fillna(0)
 runs["km"]      = pd.to_numeric(runs["km"],      errors="coerce")
 
 # ── Bandeau compteur ──────────────────────────────────────────────────────────
-st.info(f"**{jours_rest} jours** avant le départ · 28 novembre 2026 · 45 km / ~1 200 m D+")
+st.info(f"**{jours_rest} jours** avant le départ · {RACE_DATE:%d/%m/%Y} · "
+        f"{RACE_KM:g} km / ~{RACE_DPLUS} m D+")
 
 # ── Navigation par question ───────────────────────────────────────────────────
 QUESTIONS = [
@@ -225,7 +227,8 @@ with st.expander(QUESTIONS[3], expanded=False):
               delta=f"Cible {RACE_RATIO:.1f}")
 
     # Progression longue par semaine
-    runs["semaine"] = runs["date"].dt.strftime("%Y-W%W")
+    iso = runs["date"].dt.isocalendar()
+    runs["semaine"] = iso["year"].astype(str) + "-W" + iso["week"].astype(str).str.zfill(2)
     weekly_run = runs.groupby("semaine").agg(
         dplus_m=("dplus_m", "sum"),
         km=("km",      "sum"),
@@ -402,112 +405,11 @@ with st.expander(QUESTIONS[5], expanded=False):
 st.divider()
 
 # ══════════════════════════════════════════════════════════════════════════════
-# Bilan hebdomadaire exportable
+# Bilan hebdomadaire → page dédiée
 # ══════════════════════════════════════════════════════════════════════════════
-st.subheader("Bilan hebdomadaire exportable")
-
-# Fenêtre : semaine courante et précédente
-today        = date.today()
-lundi_this   = today - timedelta(days=today.weekday())
-lundi_last   = lundi_this - timedelta(weeks=1)
-
-wk_this  = wk[(wk["date"] >= pd.Timestamp(lundi_this)) & (wk["date"] < pd.Timestamp(lundi_this + timedelta(weeks=1)))]
-wk_last  = wk[(wk["date"] >= pd.Timestamp(lundi_last)) & (wk["date"] < pd.Timestamp(lundi_this))]
-
-col_sel1, col_sel2 = st.columns([1, 3])
-semaine_bilan = col_sel1.selectbox(
-    "Semaine",
-    ["Semaine en cours", "Semaine précédente"],
+st.subheader("Bilan hebdomadaire")
+st.write(
+    "Le bilan hebdomadaire pour le coach (digest, séances, zones, dérive, journal, "
+    "tendance 8 semaines) se génère dans la page dédiée."
 )
-wk_bilan = wk_this if semaine_bilan == "Semaine en cours" else wk_last
-lundi_ref = lundi_this if semaine_bilan == "Semaine en cours" else lundi_last
-semaine_label = lundi_ref.strftime("%Y-W%W")
-
-# Calcul métriques semaine
-runs_b      = wk_bilan[wk_bilan["type"].isin(TYPES_COURSE)].copy()
-km_b        = pd.to_numeric(runs_b["km"], errors="coerce").sum()
-dplus_b     = pd.to_numeric(runs_b["dplus_m"], errors="coerce").fillna(0).sum()
-duree_b     = pd.to_numeric(wk_bilan["duree_min"], errors="coerce").sum()
-n_seances_b = len(wk_bilan)
-nocturnes_b = (wk_bilan["nocturne"] == "oui").sum() if "nocturne" in wk_bilan.columns else 0
-
-entries_bilan = journal.load()
-rpe_vals = []
-for _, row in wk_bilan.iterrows():
-    wid_ = journal.workout_id(str(row["date"].date()), str(row["heure"]), str(row["type"]))
-    e = entries_bilan.get(wid_, {})
-    if e.get("rpe") is not None:
-        rpe_vals.append(e["rpe"])
-rpe_moy_b = sum(rpe_vals) / len(rpe_vals) if rpe_vals else None
-
-# HRV et sommeil de la semaine
-daily_b = daily[
-    (daily["date"] >= pd.Timestamp(lundi_ref)) &
-    (daily["date"] < pd.Timestamp(lundi_ref + timedelta(weeks=1)))
-]
-hrv_b  = pd.to_numeric(daily_b["hrv"], errors="coerce").dropna() if "hrv" in daily_b.columns else pd.Series(dtype=float)
-sl_b   = pd.to_numeric(daily_b["sommeil_h"], errors="coerce").dropna() if "sommeil_h" in daily_b.columns else pd.Series(dtype=float)
-
-lines_md = [
-    f"# Bilan semaine {semaine_label}",
-    f"",
-    f"**Jours avant SaintExpress :** {(RACE_DATE - lundi_ref).days}",
-    f"",
-    f"## Volume",
-    f"- Séances : {n_seances_b}",
-    f"- Course/Rando : {km_b:.1f} km · {dplus_b:.0f} m D+",
-    f"- Durée totale : {duree_b:.0f} min",
-    f"- Sorties nocturnes : {nocturnes_b}",
-    f"",
-    f"## Ressenti",
-    f"- RPE moyen : {rpe_moy_b:.1f}/10 ({len(rpe_vals)} séances renseignées)" if rpe_moy_b else "- RPE : non renseigné",
-    f"",
-    f"## Récupération",
-]
-if not hrv_b.empty:
-    lines_md.append(f"- HRV moy : {hrv_b.mean():.0f} ms (référence {bases.get('hrv', {}).get('median', '?')} ms)")
-else:
-    lines_md.append("- HRV : non mesurée cette semaine")
-
-if not sl_b.empty:
-    lines_md.append(f"- Sommeil moy : {sl_b.mean():.1f} h (référence {bases.get('sommeil_h', {}).get('median', '?')} h)")
-else:
-    lines_md.append("- Sommeil : données manquantes")
-
-# Faits marquants : long run + drift
-wk_long = runs_b[pd.to_numeric(runs_b["duree_min"], errors="coerce").fillna(0) > 60]
-if not wk_long.empty:
-    r = wk_long.iloc[0]
-    lines_md += [
-        f"",
-        f"## Sortie longue",
-        f"- {r['type']} — {pd.to_numeric(r.get('km'), errors='coerce'):.1f} km · "
-        f"{pd.to_numeric(r.get('dplus_m'), errors='coerce'):.0f} m D+ · "
-        f"{pd.to_numeric(r.get('duree_min'), errors='coerce'):.0f} min",
-    ]
-
-lines_md += [
-    f"",
-    f"## Points à surveiller / à tester",
-    f"- [ ] ",
-    f"",
-    f"---",
-    f"*Généré le {date.today().strftime('%d/%m/%Y')} depuis le dashboard santé*",
-]
-
-bilan_md = "\n".join(lines_md)
-
-with st.expander("Aperçu du bilan", expanded=False):
-    st.markdown(bilan_md)
-
-st.download_button(
-    label="Télécharger le bilan (.md)",
-    data=bilan_md,
-    file_name=f"bilan_{semaine_label}.md",
-    mime="text/markdown",
-)
-
-st.caption(
-    "Le bilan Markdown peut être copié dans Obsidian, Notion ou tout éditeur compatible. "
-    "Les cases « Points à surveiller » sont à compléter manuellement."
-)
+st.page_link("pages/12_Export_bilan.py", label="Ouvrir « Export bilan coach »", icon="📦")

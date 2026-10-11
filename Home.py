@@ -29,6 +29,7 @@ pg = st.navigation({
     ],
     "Course": [
         st.Page("pages/10_SaintExpress.py",  title="SaintExpress"),
+        st.Page("pages/12_Export_bilan.py",  title="Export bilan coach"),
         st.Page("pages/11_Abreviations.py",  title="Abréviations"),
     ],
 })

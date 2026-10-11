@@ -14,10 +14,15 @@ ZONE_COLORS = {
 _BOUNDS = [0.60, 0.70, 0.80, 0.90]   # Karvonen %FCR pour Z1–Z4
 
 
+def zone_bounds(fc_repos: int, fc_max: int) -> list[float]:
+    """Bornes BPM Z1/Z2, Z2/Z3, Z3/Z4, Z4/Z5 (méthode Karvonen)."""
+    fcr = fc_max - fc_repos
+    return [fc_repos + b * fcr for b in _BOUNDS]
+
+
 def zone_limits(fc_repos: int, fc_max: int) -> dict[str, float]:
     """Retourne les BPM de chaque borne de zone (méthode Karvonen)."""
-    fcr = fc_max - fc_repos
-    bounds = [fc_repos + b * fcr for b in _BOUNDS]
+    bounds = zone_bounds(fc_repos, fc_max)
     return {
         "Z1": f"< {bounds[0]:.0f} bpm",
         "Z2": f"{bounds[0]:.0f}–{bounds[1]:.0f} bpm",
@@ -38,13 +43,18 @@ def _zone(bpm: float, fc_repos: int, fc_max: int) -> str:
     return "Z5"
 
 
-def zone_times(detail: dict, fc_repos: int, fc_max: int) -> dict[str, float]:
-    """Retourne les minutes par zone depuis les échantillons FC horodatés."""
+def zone_times(detail: dict, fc_repos: int, fc_max: int,
+               max_gap_s: int = 300) -> dict[str, float]:
+    """
+    Retourne les minutes par zone depuis les échantillons FC horodatés.
+    max_gap_s : un intervalle entre deux échantillons plus long que ce seuil
+    est considéré comme un trou (non compté).
+    """
     samples = sorted(detail.get("hr_samples", []), key=lambda x: x["ts"])
     t = {z: 0.0 for z in ZONE_NAMES}
     for i in range(len(samples) - 1):
         interval = samples[i + 1]["ts"] - samples[i]["ts"]
-        if 0 < interval <= 300:   # ignore les pauses > 5 min
+        if 0 < interval <= max_gap_s:   # ignore les pauses / trous
             t[_zone(samples[i]["bpm"], fc_repos, fc_max)] += interval / 60.0
     return t
 
