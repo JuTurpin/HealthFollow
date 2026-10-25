@@ -73,7 +73,11 @@ src/
   journal.py             # Journal d'entraînement
   config.py              # FC max / FC repos, paramètres course (date, km, D+)
   help_texts.py          # Textes d'aide des graphiques
-tests/                   # python -m unittest
+tests/                   # python -m unittest (lancé aussi par la CI GitHub Actions)
+  test_bilan_export.py   # export bilan coach (pack, zip, planning)
+  test_calculs.py        # TRIMP, zones Karvonen, drift
+  test_parser.py         # parser Apple Health, GPX, D+
+  test_synthese.py       # synthèse Home, récupération, journal, config, qualité
   fixtures/synthetique.py  # jeu de données synthétique (python -m tests.fixtures.synthetique <dossier>)
 docs/                    # rapports
 requirements.txt
